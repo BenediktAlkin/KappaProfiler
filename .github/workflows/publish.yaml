@@ -20,8 +20,8 @@ jobs:
       run: pip install -r requirements.txt
 
     # run unit tests
-#    - name: tests_unit
-#      run: python -m unittest discover --start-directory ./tests_unit
+    - name: tests_unit
+      run: python -m unittest discover --start-directory ./tests_unit
     # run integration tests
 #    - name: tests_integration
 #      run: python -m unittest discover --start-directory ./tests_integration
