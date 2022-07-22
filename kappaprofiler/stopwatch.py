@@ -36,6 +36,11 @@ class Stopwatch:
     def lap_count(self):
         return len(self._elapsed_seconds_laps)
 
+    @property
+    def average_lap_time(self):
+        assert len(self._elapsed_seconds_laps) > 0, "last_lap_time requires lap() to be called at least once"
+        return sum(self._elapsed_seconds_laps) / len(self._elapsed_seconds_laps)
+
     def __enter__(self):
         self.start()
         return self
