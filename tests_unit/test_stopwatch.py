@@ -31,10 +31,12 @@ class TestStopwatch(unittest.TestCase):
         self.assertEqual(1, sw.lap_count)
 
     def test_laps(self):
-        sleep_time = 0.001
+        sleep_time = 0.01
         laps = 10
         sw = Stopwatch().start()
         for _ in range(laps):
             time.sleep(sleep_time)
-            self.assertGreater(sw.lap(), sleep_time)
+            lap_time = sw.lap()
+            self.assertGreater(lap_time, sleep_time)
+            self.assertLess(lap_time, sleep_time * 2)
         self.assertEqual(laps, sw.lap_count)
