@@ -21,7 +21,7 @@ class Stopwatch:
     def lap(self):
         assert self._start_time is not None, "lap requires stopwatch to be started"
         if len(self._elapsed_seconds_laps) > 0:
-            lap_time = time.time() - self._start_time - self._elapsed_seconds_laps[-1]
+            lap_time = time.time() - self._start_time - sum(self._elapsed_seconds_laps)
         else:
             lap_time = time.time() - self._start_time
         self._elapsed_seconds_laps.append(lap_time)
