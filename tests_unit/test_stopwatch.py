@@ -14,3 +14,17 @@ class TestStopwatch(unittest.TestCase):
 
     def test_stop_without_start(self):
         self.assertRaises(AssertionError, lambda: Stopwatch().stop())
+
+    def test_lap_without_start(self):
+        self.assertRaises(AssertionError, lambda: Stopwatch().lap())
+
+    def test_lap_after_stop(self):
+        with self.assertRaises(AssertionError):
+            sw = Stopwatch().start()
+            sw.stop()
+            sw.lap()
+
+    def test_lap(self):
+        sw = Stopwatch().start()
+        sw.lap()
+        self.assertEqual(1, sw.lap_count)
