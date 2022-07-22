@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from kappaprofiler.stopwatch import Stopwatch
@@ -28,3 +29,12 @@ class TestStopwatch(unittest.TestCase):
         sw = Stopwatch().start()
         sw.lap()
         self.assertEqual(1, sw.lap_count)
+
+    def test_laps(self):
+        sleep_time = 0.001
+        laps = 10
+        sw = Stopwatch().start()
+        for _ in range(laps):
+            time.sleep(sleep_time)
+            self.assertGreater(sw.lap(), sleep_time)
+        self.assertEqual(laps, sw.lap_count)
