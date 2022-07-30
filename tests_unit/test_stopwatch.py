@@ -31,11 +31,17 @@ class TestStopwatch(unittest.TestCase):
 
     def test_laps(self):
         laps = 10
-        time_provider = MockTimeProvider()
-        time_provider.set_time(0.)
+        time_provider = MockTimeProvider(initial_time=0.)
         sw = Stopwatch(time_provider=time_provider).start()
         for i in range(laps):
             time_provider.add_time(1.5 + i)
             lap_time = sw.lap()
             self.assertEquals(1.5 + i, lap_time)
         self.assertEqual(laps, sw.lap_count)
+
+    def test_elapsed_seconds(self):
+        time_provider = MockTimeProvider(initial_time=0.)
+        with Stopwatch(time_provider=time_provider) as sw:
+            time_provider.add_time(5.4)
+        self.assertEqual(5.4, sw.elapsed_seconds)
+        self.assertEqual(5400, sw.elapsed_milliseconds)

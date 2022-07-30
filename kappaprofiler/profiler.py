@@ -1,13 +1,14 @@
 from contextlib import contextmanager
 
 from .time_node import TimeNode
+from .root_node import RootNode
 from .time_provider import TimeProvider
 
 class Profiler:
     def __init__(self, time_provider=None):
         self._time_provider = time_provider or TimeProvider()
-        self._root_node = None
-        self._cur_node = None
+        self._root_node = RootNode()
+        self._cur_node = self._root_node
         self._last_node = None
 
     @property
@@ -24,19 +25,13 @@ class Profiler:
         self._last_node = None
 
     def start(self, name):
-        if self._root_node is None:
-            # new root node
-            self._cur_node = TimeNode(name, time_provider=self._time_provider)
-            self._root_node = self._cur_node
-            self._cur_node.start()
+        if name in self._cur_node.children:
+            # child already exists
+            self._cur_node = self._cur_node.children[name]
         else:
-            if name in self._cur_node.children:
-                # child already exists
-                self._cur_node = self._cur_node.children[name]
-            else:
-                # new child
-                self._cur_node = TimeNode(name, parent=self._cur_node, time_provider=self._time_provider)
-            self._cur_node.start()
+            # new child
+            self._cur_node = TimeNode(name, parent=self._cur_node, time_provider=self._time_provider)
+        self._cur_node.start()
 
     def stop(self):
         self._cur_node.stop()

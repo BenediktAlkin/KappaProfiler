@@ -26,9 +26,8 @@ class TestProfiler(unittest.TestCase):
         self.assertEquals("root.nested", dotlist[1][0])
 
     def test_to_string(self):
-        time_provider = MockTimeProvider()
+        time_provider = MockTimeProvider(initial_time=0.)
         p = Profiler(time_provider=time_provider)
-        time_provider.set_time(0.)
         with p.profile("root"):
             for _ in range(2):
                 time_provider.add_time(1.2)
