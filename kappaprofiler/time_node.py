@@ -2,26 +2,40 @@ from .time_provider import TimeProvider
 
 class TimeNode:
     def __init__(self, name, parent=None, time_provider=None):
-        self.name = name
-        self.time_provider = time_provider or TimeProvider()
-        self.parent = parent
-        if self.parent is not None:
-            assert name not in self.parent.children
-            self.parent.children[name] = self
+        self._name = name
+        self._time_provider = time_provider or TimeProvider()
+        self._parent = parent
+        if self._parent is not None:
+            assert name not in self._parent.children
+            self._parent.children[name] = self
         self.children = {}
-        self.total_time = 0.
-        self.count = 0
-        self.start_time = None
+        self._last_time = None
+        self._total_time = 0.
+        self._count = 0
+        self._start_time = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @property
+    def last_time(self):
+        return self._last_time
+
+    @property
+    def total_time(self):
+        return self._total_time
 
     def start(self):
-        assert self.start_time is None, "need to stop TimeNode before starting it again"
-        self.start_time = self.time_provider.time()
+        assert self._start_time is None, "need to stop TimeNode before starting it again"
+        self._start_time = self._time_provider.time()
 
     def stop(self):
-        assert self.start_time is not None, "need to start TimeNode before stopping it"
-        self.total_time += self.time_provider.time() - self.start_time
-        self.count += 1
-        self.start_time = None
+        assert self._start_time is not None, "need to start TimeNode before stopping it"
+        self._last_time = self._time_provider.time() - self._start_time
+        self._total_time += self._last_time
+        self._count += 1
+        self._start_time = None
 
     def to_dotlist(self):
         return self._to_dotlist()
@@ -30,9 +44,9 @@ class TimeNode:
         if result is None:
             result = []
         if prefix is None:
-            name = self.name
+            name = self._name
         else:
-            name = f"{prefix}.{self.name}"
+            name = f"{prefix}.{self._name}"
         result.append((name, self))
 
         for child in self.children.values():
@@ -40,4 +54,4 @@ class TimeNode:
         return result
 
     def __repr__(self):
-        return self.name
+        return self._name

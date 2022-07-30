@@ -1,20 +1,42 @@
 import unittest
-
+from tests_util.mock_time_provider import MockTimeProvider
 from kappaprofiler.profiler import Profiler
 
 
 class TestProfiler(unittest.TestCase):
-    def test_global_and_root_lines(self):
+    def test_profile(self):
         p = Profiler()
-        p.start("test")
-        p.start("nested")
-        p.start_global("global")
-        p.stop("nested")
-        p.stop("test")
-        p.stop_global()
-        lines = p.to_string_lines()
-        self.assertEqual(3, len(lines))
-        self.assertTrue(lines[0].endswith("global.global"))
-        self.assertTrue(lines[1].endswith("test"))
-        self.assertTrue(lines[2].endswith("test.nested"))
+        with p.profile("root"):
+            with p.profile("nested"):
+                pass
+        dotlist = p.root_node.to_dotlist()
+        self.assertEqual(2, len(dotlist))
+        self.assertEquals("root", dotlist[0][0])
+        self.assertEquals("root.nested", dotlist[1][0])
 
+    def test_start_stop(self):
+        p = Profiler()
+        p.start("root")
+        p.start("nested")
+        p.stop()
+        p.stop()
+        dotlist = p.root_node.to_dotlist()
+        self.assertEqual(2, len(dotlist))
+        self.assertEquals("root", dotlist[0][0])
+        self.assertEquals("root.nested", dotlist[1][0])
+
+    def test_to_string(self):
+        time_provider = MockTimeProvider()
+        p = Profiler(time_provider=time_provider)
+        time_provider.set_time(0.)
+        with p.profile("root"):
+            for _ in range(2):
+                time_provider.add_time(1.2)
+                with p.profile("nested"):
+                    time_provider.add_time(1.7)
+
+        expected = "\n".join([
+            "5.80 root",
+            "3.40 root.nested",
+        ])
+        self.assertEquals(expected, p.to_string(time_format="4.2f"))

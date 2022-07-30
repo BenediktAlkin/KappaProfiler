@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from .time_node import TimeNode
 from .time_provider import TimeProvider
 
@@ -6,12 +8,20 @@ class Profiler:
         self._time_provider = time_provider or TimeProvider()
         self._root_node = None
         self._cur_node = None
-        self._prev_node = None
+        self._last_node = None
+
+    @property
+    def root_node(self):
+        return self._root_node
+
+    @property
+    def last_node(self):
+        return self._last_node
 
     def reset(self):
         self._root_node = None
         self._cur_node = None
-        self._prev_node = None
+        self._last_node = None
 
     def start(self, name):
         if self._root_node is None:
@@ -30,12 +40,17 @@ class Profiler:
 
     def stop(self):
         self._cur_node.stop()
-        self._prev_node = self._cur_node
+        self._last_node = self._cur_node
         self._cur_node = self._cur_node.parent
 
+    @contextmanager
+    def profile(self, name):
+        self.start(name)
+        yield
+        self.stop()
 
-    def to_string(self):
+    def to_string(self, time_format="9.2f"):
+        # 9.2f --> up to 11.5d
         assert self._root_node is not None
         dotlist = self._root_node.to_dotlist()
-        # 9.2f --> up to 11.5d
-        return "\n".join([f"{node.total_time:9.2f} {name}" for name, node in dotlist])
+        return "\n".join([f"{format(node.total_time, time_format)} {name}" for name, node in dotlist])
