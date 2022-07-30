@@ -1,33 +1,22 @@
 from .time_node import TimeNode
+from .time_provider import TimeProvider
 
 class Profiler:
-    def __init__(self):
+    def __init__(self, time_provider=None):
+        self._time_provider = time_provider or TimeProvider()
         self._root_node = None
         self._cur_node = None
         self._prev_node = None
-        self._global_nodes = {}
-        self._cur_global_node = None
 
-    def start_global(self, name):
-        self.start(name, is_global=True)
+    def reset(self):
+        self._root_node = None
+        self._cur_node = None
+        self._prev_node = None
 
-    def start(self, name, is_global=False):
-        if is_global:
-            self._start_global_node(name)
-        else:
-            self._start_node(name)
-
-    def _start_global_node(self, name):
-        if name not in self._global_nodes:
-            self._global_nodes[name] = TimeNode(name)
-        node = self._global_nodes[name]
-        node.start()
-        self._cur_global_node = node
-
-    def _start_node(self, name):
+    def start(self, name):
         if self._root_node is None:
             # new root node
-            self._cur_node = TimeNode(name)
+            self._cur_node = TimeNode(name, time_provider=self._time_provider)
             self._root_node = self._cur_node
             self._cur_node.start()
         else:
@@ -36,31 +25,17 @@ class Profiler:
                 self._cur_node = self._cur_node.children[name]
             else:
                 # new child
-                self._cur_node = TimeNode(name, parent=self._cur_node)
+                self._cur_node = TimeNode(name, parent=self._cur_node, time_provider=self._time_provider)
             self._cur_node.start()
 
-    def stop_global(self, name=None):
-        self.stop(name=name, is_global=True)
+    def stop(self):
+        self._cur_node.stop()
+        self._prev_node = self._cur_node
+        self._cur_node = self._cur_node.parent
 
-    def stop(self, name=None, is_global=False):
-        if is_global:
-            if name is None:
-                self._cur_global_node.stop()
-                self._cur_global_node = None
-            else:
-                self._global_nodes[name].stop()
-        else:
-            self._cur_node.stop()
-            self._prev_node = self._cur_node
-            self._cur_node = self._cur_node.parent
 
-    def to_string_lines(self):
-        lines = []
-        if len(self._global_nodes) > 0:
-            for global_node in self._global_nodes.values():
-                lines += global_node.to_string_lines(prefix="global")
-
-        if self._root_node is not None:
-            lines += self._root_node.to_string_lines()
-
-        return lines
+    def to_string(self):
+        assert self._root_node is not None
+        dotlist = self._root_node.to_dotlist()
+        # 9.2f --> up to 11.5d
+        return "\n".join([f"{node.total_time:9.2f} {name}" for name, node in dotlist])
