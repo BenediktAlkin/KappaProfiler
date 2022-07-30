@@ -1,29 +1,29 @@
-import time
-
+from .time_provider import TimeProvider
 
 class Stopwatch:
-    def __init__(self):
+    def __init__(self, time_provider=None):
         self._start_time = None
         self._elapsed_seconds = None
         self._elapsed_seconds_laps = []
+        self.time_provider = time_provider or TimeProvider()
 
     def start(self):
         assert self._start_time is None, "can't start running stopwatch"
-        self._start_time = time.time()
+        self._start_time = self.time_provider.time()
         return self
 
     def stop(self):
         assert self._start_time is not None, "can't stop a stopped stopwatch"
-        self._elapsed_seconds = time.time() - self._start_time
+        self._elapsed_seconds = self.time_provider.time() - self._start_time
         self._start_time = None
         return self._elapsed_seconds
 
     def lap(self):
         assert self._start_time is not None, "lap requires stopwatch to be started"
         if len(self._elapsed_seconds_laps) > 0:
-            lap_time = time.time() - self._start_time - sum(self._elapsed_seconds_laps)
+            lap_time = self.time_provider.time() - self._start_time - sum(self._elapsed_seconds_laps)
         else:
-            lap_time = time.time() - self._start_time
+            lap_time = self.time_provider.time() - self._start_time
         self._elapsed_seconds_laps.append(lap_time)
         return lap_time
 
