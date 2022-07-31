@@ -12,7 +12,7 @@ def profile(func):
 def named_profile(name, profiler_to_use=None):
     global profiler
     profiler_to_use = profiler_to_use or profiler
-    return profiler.profile(name)
+    return profiler_to_use.profile(name)
 
 def pprofile(profiler_to_use=None):
     global profiler
