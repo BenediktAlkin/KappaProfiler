@@ -15,6 +15,10 @@ class TimeNode:
         self._start_time = None
 
     @property
+    def count(self):
+        return self._count
+
+    @property
     def parent(self):
         return self._parent
 

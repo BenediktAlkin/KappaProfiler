@@ -48,4 +48,4 @@ class Profiler:
         # 9.2f --> up to 11.5d
         assert self._root_node is not None
         dotlist = self._root_node.to_dotlist()
-        return "\n".join([f"{format(node.total_time, time_format)} {name}" for name, node in dotlist])
+        return "\n".join([f"{format(node.total_time, time_format)} {name}" for name, node in dotlist if node.count > 0])
