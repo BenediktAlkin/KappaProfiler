@@ -28,6 +28,10 @@ class Stopwatch:
         return lap_time
 
     @property
+    def elapsed_seconds_laps(self):
+        return self._elapsed_seconds_laps
+
+    @property
     def last_lap_time(self):
         assert len(self._elapsed_seconds_laps) > 0, "last_lap_time requires lap() to be called at least once"
         return self._elapsed_seconds_laps[-1]
