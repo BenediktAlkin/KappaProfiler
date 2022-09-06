@@ -45,3 +45,13 @@ class TestStopwatch(unittest.TestCase):
             time_provider.add_time(5.4)
         self.assertEqual(5.4, sw.elapsed_seconds)
         self.assertEqual(5400, sw.elapsed_milliseconds)
+
+    def test_multiple_start_and_stops(self):
+        laps = 5
+        time_provider = MockTimeProvider(initial_time=0.)
+        sw = Stopwatch(time_provider=time_provider)
+        for i in range(laps):
+            with sw:
+                time_provider.add_time(1.5 + i)
+            self.assertEquals(1.5 + i, sw.last_lap_time)
+        self.assertEqual(laps, sw.lap_count)
