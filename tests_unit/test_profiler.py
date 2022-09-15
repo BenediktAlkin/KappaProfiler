@@ -39,3 +39,17 @@ class TestProfiler(unittest.TestCase):
             "3.40 root.nested",
         ])
         self.assertEquals(expected, p.to_string(time_format="4.2f"))
+
+    def test_get_node(self):
+        time_provider = MockTimeProvider(initial_time=0.)
+        p = Profiler(time_provider=time_provider)
+        with p.profile("root"):
+            for _ in range(2):
+                time_provider.add_time(1.2)
+                with p.profile("nested"):
+                    time_provider.add_time(1.7)
+
+        with self.assertRaises(AssertionError) as e:
+            p.get_node("root.invalid")
+        self.assertEquals("invalid node query 'root.invalid'", str(e.exception))
+        self.assertEquals("3.40", p.get_node("root.nested").to_string(time_format="4.2f"))

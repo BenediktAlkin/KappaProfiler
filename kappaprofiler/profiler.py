@@ -48,4 +48,12 @@ class Profiler:
         # 9.2f --> up to 11.5d
         assert self._root_node is not None
         dotlist = self._root_node.to_dotlist()
-        return "\n".join([f"{format(node.total_time, time_format)} {name}" for name, node in dotlist if node.count > 0])
+        return "\n".join([f"{node.to_string(time_format)} {name}" for name, node in dotlist if node.count > 0])
+
+    def get_node(self, query):
+        accessors = query.split(".")
+        cur_node = self.root_node
+        for i, accessor in enumerate(accessors):
+            assert accessor in cur_node.children, f"invalid node query '{'.'.join(accessors[:i+1])}'"
+            cur_node = cur_node.children[accessor]
+        return cur_node

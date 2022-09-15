@@ -57,6 +57,14 @@ The result will be (time.sleep calls are not 100% accurate)
 0.20 main2
 ```
 
+## Query nodes
+Each profiling entry is represented by a node from which detailed information can be retrieved
+```
+query = "main.some_method"
+node = kp.profiler.get_node(query)
+print(f"{query} was called {node.count} time and took {node.to_string()} seconds in total")
+```
+`main.some_method was called 1 time and took 0.51 seconds in total`
 
 ## Time only a part of your program
 ```

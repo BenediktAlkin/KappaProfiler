@@ -57,5 +57,12 @@ class TimeNode:
             child._to_dotlist(prefix=name, result=result)
         return result
 
+    @property
+    def name(self):
+        return self._name
+
     def __repr__(self):
         return self._name
+
+    def to_string(self, time_format=".2f"):
+        return format(self.total_time, time_format)
