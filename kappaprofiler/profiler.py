@@ -1,31 +1,31 @@
 from contextlib import contextmanager
 from typing import Callable, Any
 
-from .time_node import TimeNode
+from .node import Node
 from .time_provider import TimeProvider
 
 class Profiler:
     def __init__(self, time_provider: TimeProvider = None):
         self._time_provider: TimeProvider = None
-        self._root_node: TimeNode = None
-        self._cur_node: TimeNode = None
-        self._last_node: TimeNode = None
+        self._root_node: Node = None
+        self._cur_node: Node = None
+        self._last_node: Node = None
         self.reset(time_provider=time_provider)
 
 
     def reset(self, time_provider: TimeProvider = None) -> None:
         self._time_provider: TimeProvider = time_provider or TimeProvider()
-        self._root_node: TimeNode = TimeNode()
-        self._cur_node: TimeNode = self._root_node
-        self._last_node: TimeNode = None
+        self._root_node: Node = Node()
+        self._cur_node: Node = self._root_node
+        self._last_node: Node = None
 
 
     @property
-    def root_node(self) -> TimeNode:
+    def root_node(self) -> Node:
         return self._root_node
 
     @property
-    def last_node(self) -> TimeNode:
+    def last_node(self) -> Node:
         return self._last_node
 
     def _start(self, name: str) -> None:
@@ -34,13 +34,13 @@ class Profiler:
             self._cur_node = self._cur_node.children[name]
         else:
             # new child
-            self._cur_node = TimeNode(name, parent=self._cur_node, time_provider=self._time_provider)
+            self._cur_node = Node(name, parent=self._cur_node, time_provider=self._time_provider)
 
     def start(self, name: str) -> None:
         self._start(name)
         self._cur_node.start()
 
-    def start_async(self, name: str) -> TimeNode:
+    def start_async(self, name: str) -> Node:
         self._start(name)
         return self._cur_node
 
@@ -74,7 +74,7 @@ class Profiler:
         dotlist = self._root_node.to_dotlist()
         return "\n".join([f"{node.to_string(time_format)} {name}" for name, node in dotlist if node.count > 0])
 
-    def get_node(self, query: str) -> TimeNode:
+    def get_node(self, query: str) -> Node:
         accessors = query.split(".")
         cur_node = self._root_node
         for i, accessor in enumerate(accessors):

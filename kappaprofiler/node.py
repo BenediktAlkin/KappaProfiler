@@ -1,11 +1,11 @@
 from .time_provider import TimeProvider
 from typing import List, Dict
 
-class TimeNode:
-    def __init__(self, name: str = None, parent: "TimeNode" = None, time_provider: TimeProvider = None):
+class Node:
+    def __init__(self, name: str = None, parent: "Node" = None, time_provider: TimeProvider = None):
         super().__init__()
-        self._parent: "TimeNode" = parent
-        self.children: Dict[str, "TimeNode"] = {}
+        self._parent: "Node" = parent
+        self.children: Dict[str, "Node"] = {}
         if self._parent is not None:
             assert name is not None
             assert name not in self._parent.children
@@ -26,7 +26,7 @@ class TimeNode:
         return self._count
 
     @property
-    def parent(self) -> "TimeNode":
+    def parent(self) -> "Node":
         return self._parent
 
     @property
@@ -38,11 +38,11 @@ class TimeNode:
         return self._total_time
 
     def start(self) -> None:
-        assert self._start_time is None, "need to stop TimeNode before starting it again"
+        assert self._start_time is None, "need to stop Node before starting it again"
         self._start_time = self._time_provider.time()
 
     def stop(self) -> None:
-        assert self._start_time is not None, "need to start TimeNode before stopping it"
+        assert self._start_time is not None, "need to start Node before stopping it"
         self.add_time(self._time_provider.time() - self._start_time)
         self._start_time = None
 

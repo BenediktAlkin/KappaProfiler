@@ -1,12 +1,12 @@
 import unittest
-from kappaprofiler.time_node import TimeNode
+from kappaprofiler.node import Node
 
-class TestTimeNode(unittest.TestCase):
+class TestNode(unittest.TestCase):
     def test_to_dotlist(self):
-        root = TimeNode("root")
-        child1 = TimeNode("child1", parent=root)
-        child11 = TimeNode("child11", parent=child1)
-        child2 = TimeNode("child2", parent=root)
+        root = Node("root")
+        child1 = Node("child1", parent=root)
+        child11 = Node("child11", parent=child1)
+        child2 = Node("child2", parent=root)
 
         dotlist = root.to_dotlist()
 
