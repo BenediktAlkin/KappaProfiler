@@ -54,8 +54,8 @@ class Profiler:
         self._cur_node = self._cur_node.parent
 
     def stop(self) -> None:
-        self._stop()
         self._cur_node.stop()
+        self._stop()
 
     @contextmanager
     def profile(self, name: str) -> None:
@@ -78,7 +78,7 @@ class Profiler:
             yield
             elapsed_time = async_profile_end(async_event)
             node.add_time(elapsed_time)
-        self._stop()
+            self._stop()
 
     def to_string(self, time_format: str = "9.2f") -> str:
         # 9.2f --> up to 11.5d
