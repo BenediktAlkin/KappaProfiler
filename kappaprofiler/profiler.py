@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from typing import Callable, Any
 
 from .time_node import TimeNode
 from .time_provider import TimeProvider
@@ -39,7 +40,7 @@ class Profiler:
         self._start(name)
         self._cur_node.start()
 
-    def async_start(self, name: str) -> TimeNode:
+    def start_async(self, name: str) -> TimeNode:
         self._start(name)
         return self._cur_node
 
@@ -53,6 +54,19 @@ class Profiler:
         self.start(name)
         yield
         self.stop()
+
+    @contextmanager
+    def profile_async(
+            self,
+            name: str,
+            async_profile_start: Callable[[], Any],
+            async_profile_end: Callable[[Any], float],
+    ) -> None:
+        node = self.start_async(name)
+        async_event = async_profile_start()
+        yield
+        elapsed_time = async_profile_end(async_event)
+        node.add_time(elapsed_time)
 
     def to_string(self, time_format: str = "9.2f") -> str:
         # 9.2f --> up to 11.5d

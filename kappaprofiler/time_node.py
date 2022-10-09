@@ -43,10 +43,13 @@ class TimeNode:
 
     def stop(self) -> None:
         assert self._start_time is not None, "need to start TimeNode before stopping it"
-        self._last_time = self._time_provider.time() - self._start_time
+        self.add_time(self._time_provider.time() - self._start_time)
+        self._start_time = None
+
+    def add_time(self, time: float) -> None:
+        self._last_time = time
         self._total_time += self._last_time
         self._count += 1
-        self._start_time = None
 
     def to_dotlist(self) -> List[str]:
         if self._parent is None:

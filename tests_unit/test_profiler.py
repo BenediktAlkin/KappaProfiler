@@ -53,3 +53,22 @@ class TestProfiler(unittest.TestCase):
             p.get_node("root.invalid")
         self.assertEquals("invalid node query 'root.invalid'", str(e.exception))
         self.assertEquals("3.40", p.get_node("root.nested").to_string(time_format="4.2f"))
+
+
+    def test_profile_async(self):
+        time_provider = MockTimeProvider(initial_time=0.)
+        p = Profiler(time_provider=time_provider)
+
+        start_async = lambda: MockTimeProvider(initial_time=0.)
+
+        def end_async(mtp: MockTimeProvider):
+            mtp.add_time(1.2)
+            return mtp.time()
+
+        with p.profile_async("test", start_async, end_async):
+            with p.profile("nested"):
+                time_provider.add_time(0.3)
+
+
+        self.assertEquals("1.20", p.get_node("test").to_string(time_format="4.2f"))
+        self.assertEquals("0.30", p.get_node("test.nested").to_string(time_format="4.2f"))
