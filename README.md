@@ -103,7 +103,8 @@ operation2 took 0.61 seconds (average 0.30)
 ```
 
 ## Time async operations
-Showcase timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in[pytorch](https://github.com/pytorch/pytorch)
+Showcase timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in 
+[pytorch](https://github.com/pytorch/pytorch)
 
 Asynchronous operations can only be timed properly when the asynchronous call is awaited or a synchronization point is
 created after the timing should end. Natively in pytorch this would look something like this:
