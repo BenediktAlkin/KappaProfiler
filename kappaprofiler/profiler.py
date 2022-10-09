@@ -29,6 +29,10 @@ class Profiler:
     def last_node(self) -> Node:
         return self._last_node
 
+    @property
+    def cur_node(self) -> Node:
+        return self._cur_node
+
     def _start(self, name: str) -> None:
         if name in self._cur_node.children:
             # child already exists
@@ -45,10 +49,13 @@ class Profiler:
         self._start(name)
         return self._cur_node
 
-    def stop(self) -> None:
-        self._cur_node.stop()
+    def _stop(self) -> None:
         self._last_node = self._cur_node
         self._cur_node = self._cur_node.parent
+
+    def stop(self) -> None:
+        self._stop()
+        self._cur_node.stop()
 
     @contextmanager
     def profile(self, name: str) -> None:
@@ -71,6 +78,7 @@ class Profiler:
             yield
             elapsed_time = async_profile_end(async_event)
             node.add_time(elapsed_time)
+        self._stop()
 
     def to_string(self, time_format: str = "9.2f") -> str:
         # 9.2f --> up to 11.5d

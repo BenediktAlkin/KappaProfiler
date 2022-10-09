@@ -77,4 +77,18 @@ class TestProfiler(unittest.TestCase):
         p = Profiler()
         with p.profile_async("test", None, None):
             pass
-        self.assertEqual(None, p.last_node)
+        self.assertIsNone(p.last_node)
+
+    def test_async_changes_cur_node(self):
+        p = Profiler()
+
+        start_async = lambda: MockTimeProvider(initial_time=0.)
+
+        def end_async(mtp: MockTimeProvider):
+            mtp.add_time(1.2)
+            return mtp.time()
+
+        with p.profile_async("test", start_async, end_async):
+            pass
+        self.assertEqual(p.root_node, p.cur_node)
+        self.assertEqual("test", p.last_node.name)
