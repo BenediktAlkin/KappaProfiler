@@ -176,3 +176,4 @@ if __name__ == "__main__":
 
 If you want to remove all synchronization points in your program, simply remove the 
 `kp.setup_async` call and `kp.named_profile_async`/`kp.profile_async` will default to a noop.
+Or replace it with `kp.setup_async_as_sync` to maek the asynchronous calls behave just like the synchronous calls.

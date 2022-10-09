@@ -41,6 +41,20 @@ def named_profile_async(name: str, profiler_to_use: Profiler = None) -> None:
     return profiler_to_use.profile_async(name, _profiler_start_async, _profiler_end_async)
 #endregion
 
+#region setup async as sync
+def setup_async_as_sync():
+    global _profiler_start_async, _profiler_end_async
+    _profiler_start_async = _sync_start_event
+    _profiler_end_async = _sync_end_event
+
+def _sync_start_event():
+    return time()
+
+def _sync_end_event(start_time):
+    end_time = time()
+    return end_time - start_time
+#endregion
+
 def pprofile(profiler_to_use: Profiler = None) -> Callable[..., Any]:
     global profiler
     profiler_to_use = profiler_to_use or profiler
