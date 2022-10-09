@@ -132,13 +132,17 @@ def main():
     with kp.named_profile("matmul_wrong"):
         # matrix multiplication (@) is asynchronous
         _ = x @ x
-    # the timing for "matmul_wrong" is only the time it took to 
+    # the timing for "matmul_wrong" is only the time it took to
     # submit the x @ x operation to the cuda event stream
     # not the actual time the x @ x operation took
 
     with kp.named_profile_async("matmul_right"):
-        # matrix multiplication (@) is asynchronous
         _ = x @ x
+    matmul_method(x)
+
+@kp.profile_async
+def matmul_method(x):
+    _ = x @ x
 
 def start_async():
     start_event = torch.cuda.Event(enable_timing=True)
@@ -160,5 +164,9 @@ if __name__ == "__main__":
 ```
 ```
 0.56 matmul_wrong
-4.70 matmul_right
+4.69 matmul_right
+4.72 matmul_right.matmul_method
 ```
+
+If you want to remove all synchronization points in your program, simply remove the 
+`kp.setup_async(start_async, end_async)` call and `kp.named_profile_async`/`kp.profile_async` will default to a noop.

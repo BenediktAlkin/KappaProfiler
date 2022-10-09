@@ -12,8 +12,12 @@ def main():
     # not the actual time the x @ x operation took
 
     with kp.named_profile_async("matmul_right"):
-        # matrix multiplication (@) is asynchronous
         _ = x @ x
+    matmul_method(x)
+
+@kp.profile_async
+def matmul_method(x):
+    _ = x @ x
 
 def start_async():
     start_event = torch.cuda.Event(enable_timing=True)
