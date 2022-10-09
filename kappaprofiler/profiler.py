@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 from typing import Callable, Any
 
@@ -62,11 +63,14 @@ class Profiler:
             async_profile_start: Callable[[], Any],
             async_profile_end: Callable[[Any], float],
     ) -> None:
-        node = self.start_async(name)
-        async_event = async_profile_start()
-        yield
-        elapsed_time = async_profile_end(async_event)
-        node.add_time(elapsed_time)
+        if async_profile_start is None or async_profile_end is None:
+            yield
+        else:
+            node = self.start_async(name)
+            async_event = async_profile_start()
+            yield
+            elapsed_time = async_profile_end(async_event)
+            node.add_time(elapsed_time)
 
     def to_string(self, time_format: str = "9.2f") -> str:
         # 9.2f --> up to 11.5d

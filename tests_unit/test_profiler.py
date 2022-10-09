@@ -72,3 +72,9 @@ class TestProfiler(unittest.TestCase):
 
         self.assertEquals("1.20", p.get_node("test").to_string(time_format="4.2f"))
         self.assertEquals("0.30", p.get_node("test.nested").to_string(time_format="4.2f"))
+
+    def test_noop_without_async_setup(self):
+        p = Profiler()
+        with p.profile_async("test", None, None):
+            pass
+        self.assertEqual(None, p.last_node)

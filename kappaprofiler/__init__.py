@@ -28,6 +28,8 @@ def setup_async(profiler_start_async: Callable[[], Any], profiler_end_async: Cal
     _profiler_end_async = profiler_end_async
 
 def profile_async(func: Callable[..., Any]) -> Callable[..., Any]:
+    global _profiler_start_async, _profiler_end_async
+
     def _profile(*args, **kwargs) -> Any:
         with profiler.profile_async(func.__name__, _profiler_start_async, _profiler_end_async):
             return func(*args, **kwargs)

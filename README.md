@@ -1,5 +1,6 @@
 # KappaProfiler
 Lightweight profiling utilities for identifying bottlenecks and timing program parts in your python application. 
+Support for async profiling 
 
 # Setup
 - new install: `pip install kappaprofiler`
@@ -99,4 +100,65 @@ print(f"operation2 took {sw2.elapsed_seconds:.2f} seconds (average {sw2.average_
 ```
 operation1 took 0.32 seconds (average 0.16)
 operation2 took 0.61 seconds (average 0.30)
+```
+
+## Time async operations
+Showcase timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in[pytorch](https://github.com/pytorch/pytorch)
+
+Asynchronous operations can only be timed properly when the asynchronous call is awaited or a synchronization point is
+created after the timing should end. Natively in pytorch this would look something like this:
+```
+start_event = torch.cuda.Event(enable_timing=True)
+start_event.record()
+
+# some asynchronous cuda calls
+
+end_event = torch.cuda.Event(enable_timing=True)
+end_event.record()
+# synchronize
+torch.cuda.synchronize()
+print(start_event.elapsed_time(end_event))
+```
+which is quite a lot of boilerplate for timing one operation.
+
+With kappaprofiler it looks like this:
+```
+import kappaprofiler as kp
+import torch
+
+def main():
+    device = torch.device("cuda")
+    x = torch.randn(15000, 15000, device=device)
+    with kp.named_profile("matmul_wrong"):
+        # matrix multiplication (@) is asynchronous
+        _ = x @ x
+    # the timing for "matmul_wrong" is only the time it took to 
+    # submit the x @ x operation to the cuda event stream
+    # not the actual time the x @ x operation took
+
+    with kp.named_profile_async("matmul_right"):
+        # matrix multiplication (@) is asynchronous
+        _ = x @ x
+
+def start_async():
+    start_event = torch.cuda.Event(enable_timing=True)
+    start_event.record()
+    return start_event
+
+def end_async(start_event):
+    end_event = torch.cuda.Event(enable_timing=True)
+    end_event.record()
+    torch.cuda.synchronize()
+    # torch.cuda.Event.elapsed_time returns milliseconds but kappaprofiler expects seconds
+    return start_event.elapsed_time(end_event) / 1000
+
+
+if __name__ == "__main__":
+    kp.setup_async(start_async, end_async)
+    main()
+    print(kp.profiler.to_string())
+```
+```
+0.56 matmul_wrong
+4.70 matmul_right
 ```
