@@ -1,6 +1,6 @@
 # KappaProfiler
 Lightweight profiling utilities for identifying bottlenecks and timing program parts in your python application. 
-Support for async profiling 
+Also supports [async profiling for cuda](https://github.com/BenediktAlkin/KappaProfiler#time-async-operations).
 
 # Setup
 - new install: `pip install kappaprofiler`
