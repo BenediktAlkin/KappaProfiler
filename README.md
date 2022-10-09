@@ -109,15 +109,20 @@ Showcase timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in
 Asynchronous operations can only be timed properly when the asynchronous call is awaited or a synchronization point is
 created after the timing should end. Natively in pytorch this would look something like this:
 ```
+# submit a start event to the event stream
 start_event = torch.cuda.Event(enable_timing=True)
 start_event.record()
 
-# some asynchronous cuda calls
+# submit a async operation to the event stream
+...
 
+# submit a end event to the event stream
 end_event = torch.cuda.Event(enable_timing=True)
 end_event.record()
+
 # synchronize
 torch.cuda.synchronize()
+
 print(start_event.elapsed_time(end_event))
 ```
 which is quite a lot of boilerplate for timing one operation.
