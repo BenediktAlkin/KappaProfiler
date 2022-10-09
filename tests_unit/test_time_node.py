@@ -10,8 +10,7 @@ class TestTimeNode(unittest.TestCase):
 
         dotlist = root.to_dotlist()
 
-        self.assertEqual(4, len(dotlist))
-        self.assertEqual(("root", root), dotlist[0])
-        self.assertEqual(("root.child1", child1), dotlist[1])
-        self.assertEqual(("root.child1.child11", child11), dotlist[2])
-        self.assertEqual(("root.child2", child2), dotlist[3])
+        self.assertEqual(3, len(dotlist))
+        self.assertEqual(("child1", child1), dotlist[0])
+        self.assertEqual(("child1.child11", child11), dotlist[1])
+        self.assertEqual(("child2", child2), dotlist[2])
