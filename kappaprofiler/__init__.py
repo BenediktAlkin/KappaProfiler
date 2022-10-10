@@ -1,6 +1,7 @@
 from .stopwatch import Stopwatch
 from .profiler import Profiler
 from typing import Callable, Any
+from time import time as _time
 
 profiler: Profiler = Profiler()
 _profiler_start_async: Callable[[], Any] = None
@@ -48,10 +49,10 @@ def setup_async_as_sync():
     _profiler_end_async = _sync_end_event
 
 def _sync_start_event():
-    return time()
+    return _time()
 
 def _sync_end_event(start_time):
-    end_time = time()
+    end_time = _time()
     return end_time - start_time
 #endregion
 
