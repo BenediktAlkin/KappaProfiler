@@ -1,3 +1,5 @@
+[![publish](https://github.com/BenediktAlkin/KappaProfiler/actions/workflows/publish.yaml/badge.svg)](https://github.com/BenediktAlkin/KappaProfiler/actions/workflows/publish.yaml)
+
 # KappaProfiler
 Lightweight profiling utilities for identifying bottlenecks and timing program parts in your python application. 
 
