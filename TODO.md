@@ -1,1 +1,2 @@
 - profiler node tostring should have recursive flag
+- add example for distributed profiling to readme
