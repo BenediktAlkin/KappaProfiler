@@ -106,7 +106,7 @@ operation2 took 0.61 seconds (average 0.30)
 ```
 
 ## Time async operations
-Showcase timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in 
+Showcase: timing [cuda](https://developer.nvidia.com/cuda-toolkit) operations in 
 [pytorch](https://github.com/pytorch/pytorch)
 
 Asynchronous operations can only be timed properly when the asynchronous call is awaited or a synchronization point is
@@ -180,3 +180,18 @@ if __name__ == "__main__":
 If you want to remove all synchronization points in your program, simply remove the 
 `kp.setup_async` call and `kp.named_profile_async`/`kp.profile_async` will default to a noop.
 Or replace it with `kp.setup_async_as_sync` to maek the asynchronous calls behave just like the synchronous calls.
+
+### Multi-process pytorch profiling
+Only synchronizing cuda operations is not sufficient when multiple processes are used (e.g. for multi-gpu training).
+In addition to cuda synchronization, the processes have to be synced up.
+```
+import torch.distributed as dist
+def end_async(start_event):
+    if dist.is_available() and dist.is_initialized():
+        dist.barrier()
+    end_event = torch.cuda.Event(enable_timing=True)
+    end_event.record()
+    torch.cuda.synchronize()
+    # torch.cuda.Event.elapsed_time returns milliseconds but kappaprofiler expects seconds
+    return start_event.elapsed_time(end_event) / 1000
+```
