@@ -37,6 +37,14 @@ class Node:
     def total_time(self) -> float:
         return self._total_time
 
+    @property
+    def average_time(self) -> float:
+        return self._total_time / self._count
+
+    @property
+    def mean_time(self) -> float:
+        return self._total_time / self._count
+
     def start(self) -> None:
         assert self._start_time is None, "need to stop Node before starting it again"
         self._start_time = self._time_provider.time()
