@@ -38,10 +38,6 @@ class Node:
         return self._total_time
 
     @property
-    def average_time(self) -> float:
-        return self._total_time / self._count
-
-    @property
     def mean_time(self) -> float:
         return self._total_time / self._count
 
