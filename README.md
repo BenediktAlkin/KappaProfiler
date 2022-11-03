@@ -174,7 +174,7 @@ if __name__ == "__main__":
 ```
 0.56 matmul_wrong
 4.69 matmul_right
-4.72 matmul_right.matmul_method
+4.72 matmul_method
 ```
 
 If you want to remove all synchronization points in your program, simply remove the 
