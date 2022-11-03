@@ -177,9 +177,15 @@ if __name__ == "__main__":
 4.72 matmul_method
 ```
 
-If you want to remove all synchronization points in your program, simply remove the 
-`kp.setup_async` call and `kp.named_profile_async`/`kp.profile_async` will default to a noop.
-Or replace it with `kp.setup_async_as_sync` to maek the asynchronous calls behave just like the synchronous calls.
+<b>NOTE: Synchronization points slow down overall program execution, so they should only be used for investigating 
+bottlenecks/runtimes</b>
+
+To remove all synchronization points in your program either:
+- remove the `kp.setup_async` call -> `kp.named_profile_async`/`kp.profile_async` will default to a noop (NOTE: this
+  removes the node completely, so it's also not possible to query it)
+- replace the `kp.setup_async` call with `kp.setup_async_as_sync` to make the asynchronous calls behave just like the 
+  synchronous calls. This will make the async times wrong (like `matmul_wrong` above) but still creates a node for the 
+  operation (e.g. for querying how often it was called).
 
 ### Multi-process pytorch profiling
 Only synchronizing cuda operations is not sufficient when multiple processes are used (e.g. for multi-gpu training).
@@ -188,6 +194,7 @@ In addition to cuda synchronization, the processes have to be synced up.
 import torch.distributed as dist
 def end_async(start_event):
     if dist.is_available() and dist.is_initialized():
+        torch.cuda.synchronize()
         dist.barrier()
     end_event = torch.cuda.Event(enable_timing=True)
     end_event.record()
