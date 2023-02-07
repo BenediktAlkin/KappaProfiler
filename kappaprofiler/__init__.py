@@ -2,6 +2,7 @@ from .stopwatch import Stopwatch
 from .profiler import Profiler
 from typing import Callable, Any
 from time import time as _time
+from .print_elapsed import print_elapsed_seconds
 
 profiler: Profiler = Profiler()
 _profiler_start_async: Callable[[], Any] = None
@@ -66,3 +67,4 @@ def pprofile(profiler_to_use: Profiler = None) -> Callable[..., Any]:
                 return func(*args, **kwargs)
         return __profile
     return _profile
+
