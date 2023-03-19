@@ -14,3 +14,11 @@ class TestNode(unittest.TestCase):
         self.assertEqual(("child1", child1), dotlist[0])
         self.assertEqual(("child1.child11", child11), dotlist[1])
         self.assertEqual(("child2", child2), dotlist[2])
+
+    def test_is_running(self):
+        root = Node("root")
+        self.assertFalse(root.is_running)
+        root.start()
+        self.assertTrue(root.is_running)
+        root.stop()
+        self.assertFalse(root.is_running)

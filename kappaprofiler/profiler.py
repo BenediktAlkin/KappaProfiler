@@ -60,8 +60,12 @@ class Profiler:
     @contextmanager
     def profile(self, name: str) -> None:
         self.start(name)
-        yield
-        self.stop()
+        try:
+            yield
+            self.stop()
+        except:
+            self.stop()
+            raise
 
     @contextmanager
     def profile_async(
@@ -75,10 +79,16 @@ class Profiler:
         else:
             node = self.start_async(name)
             async_event = async_profile_start()
-            yield
-            elapsed_time = async_profile_end(async_event)
-            node.add_time(elapsed_time)
-            self._stop()
+            try:
+                yield
+                elapsed_time = async_profile_end(async_event)
+                node.add_time(elapsed_time)
+                self._stop()
+            except:
+                elapsed_time = async_profile_end(async_event)
+                node.add_time(elapsed_time)
+                self._stop()
+                raise
 
     def to_string(self, time_format: str = "9.2f") -> str:
         # 9.2f --> up to 11.5d
